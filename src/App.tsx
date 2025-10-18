@@ -11,6 +11,14 @@ import Marketplace from "./pages/Marketplace";
 import Transacoes from "./pages/Transacoes";
 import Perfil from "./pages/Perfil";
 import NotFound from "./pages/NotFound";
+// Páginas do Marketplace
+import SearchResults from "./pages/SearchResults";
+import CategoryPage from "./pages/CategoryPage";
+import ProductDetailPage from "./pages/ProductDetailPage";
+import CartPage from "./pages/CartPage";
+import CheckoutPage from "./pages/CheckoutPage";
+import OrderConfirmationPage from "./pages/OrderConfirmationPage";
+import OrderTrackingPage from "./pages/OrderTrackingPage";
 
 const queryClient = new QueryClient();
 
@@ -29,6 +37,16 @@ const App = () => (
             <Route path="/transacoes" element={<Transacoes />} />
             <Route path="/transacoes/:tipo" element={<Transacoes />} />
             <Route path="/perfil" element={<Perfil />} />
+            
+            {/* Rotas do Marketplace */}
+            <Route path="/busca" element={<SearchResults />} />
+            <Route path="/categoria/:categorySlug" element={<CategoryPage />} />
+            <Route path="/produto/:productId" element={<ProductDetailPage />} />
+            <Route path="/carrinho" element={<CartPage />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
+            <Route path="/pedido-confirmado" element={<OrderConfirmationPage />} />
+            <Route path="/pedido/:orderNumber" element={<OrderTrackingPage />} />
+            
             <Route path="*" element={<NotFound />} />
           </Routes>
         </AuthProvider>

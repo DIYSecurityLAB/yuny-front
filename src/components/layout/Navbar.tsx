@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut, Settings, LayoutDashboard } from 'lucide-react';
+import { User, LogOut, Settings, LayoutDashboard, ShoppingBag, ShoppingCart } from 'lucide-react';
 
 export const Navbar = () => {
   const { user, signOut } = useAuth();
@@ -31,11 +31,15 @@ export const Navbar = () => {
                   <LayoutDashboard className="mr-2 h-4 w-4" />
                   Dashboard
                 </Button>
-                <Button variant="ghost" onClick={() => navigate('/marketplace')}>
+                <Button variant="ghost" onClick={() => navigate('/busca')}>
+                  <ShoppingBag className="mr-2 h-4 w-4" />
                   Marketplace
                 </Button>
                 <Button variant="ghost" onClick={() => navigate('/transacoes')}>
                   Transações
+                </Button>
+                <Button variant="ghost" size="icon" onClick={() => navigate('/carrinho')}>
+                  <ShoppingCart className="h-5 w-5" />
                 </Button>
                 
                 <DropdownMenu>

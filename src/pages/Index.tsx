@@ -41,8 +41,8 @@ const Index = () => {
               Começar Agora
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate('/marketplace')}>
-              Ver Marketplace
+            <Button size="lg" variant="outline" onClick={() => navigate('/busca')}>
+              Explorar Produtos
             </Button>
           </div>
         </div>
