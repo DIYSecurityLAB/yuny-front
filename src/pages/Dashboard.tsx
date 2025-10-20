@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
@@ -7,12 +7,27 @@ import { Button } from '@/components/ui/button';
 import { Navbar } from '@/components/layout/Navbar';
 import { ArrowUpRight, ArrowDownRight, Users, ShoppingBag } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { useIsMobile } from '@/hooks/use-mobile';
+
+interface Transacao {
+  id: string;
+  tipo: string;
+  pontos: number;
+  valor: number;
+  created_at: string;
+  status: string;
+  cotacao: number;
+  destinatario_id: string;
+  produto_id: string;
+  user_id: string;
+}
 
 const Dashboard = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [saldo, setSaldo] = useState<number | null>(null);
-  const [transacoes, setTransacoes] = useState<any[]>([]);
+  const [transacoes, setTransacoes] = useState<Transacao[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,19 +36,15 @@ const Dashboard = () => {
     }
   }, [user, authLoading, navigate]);
 
-  useEffect(() => {
-    if (user) {
-      loadDashboardData();
-    }
-  }, [user]);
-
-  const loadDashboardData = async () => {
+  const loadDashboardData = useCallback(async () => {
+    if (!user) return;
+    
     try {
       // Buscar saldo
       const { data: pontosData } = await supabase
         .from('pontos')
         .select('saldo')
-        .eq('user_id', user!.id)
+        .eq('user_id', user.id)
         .single();
 
       if (pontosData) {
@@ -44,7 +55,7 @@ const Dashboard = () => {
       const { data: transacoesData } = await supabase
         .from('transacoes')
         .select('*')
-        .eq('user_id', user!.id)
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(5);
 
@@ -56,7 +67,13 @@ const Dashboard = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [user]);
+
+  useEffect(() => {
+    if (user) {
+      loadDashboardData();
+    }
+  }, [user, loadDashboardData]);
 
   if (authLoading || !user) {
     return null;
@@ -65,14 +82,14 @@ const Dashboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="container mx-auto px-4 py-8">
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Dashboard</h1>
+      <div className="container mx-auto px-4 py-6 sm:py-8">
+        <div className="mb-6 sm:mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold mb-2">Dashboard</h1>
           <p className="text-muted-foreground">Bem-vindo de volta à YunY</p>
         </div>
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-          <Card>
+        <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-6 sm:mb-8">
+          <Card className="col-span-1 sm:col-span-2 lg:col-span-1">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Saldo em Pontos</CardTitle>
             </CardHeader>
@@ -124,7 +141,7 @@ const Dashboard = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle>Transações Recentes</CardTitle>
+            <CardTitle className="text-lg sm:text-xl">Transações Recentes</CardTitle>
             <CardDescription>Suas últimas 5 transações</CardDescription>
           </CardHeader>
           <CardContent>
@@ -143,13 +160,13 @@ const Dashboard = () => {
                 {transacoes.map((transacao) => (
                   <div
                     key={transacao.id}
-                    className="flex items-center justify-between p-4 rounded-lg border border-border"
+                    className="flex flex-col sm:flex-row sm:items-center justify-between p-4 rounded-lg border border-border space-y-2 sm:space-y-0"
                   >
                     <div className="flex items-center space-x-4">
                       {transacao.tipo === 'compra' ? (
-                        <ArrowUpRight className="h-5 w-5 text-success" />
+                        <ArrowUpRight className="h-5 w-5 text-success flex-shrink-0" />
                       ) : (
-                        <ArrowDownRight className="h-5 w-5 text-destructive" />
+                        <ArrowDownRight className="h-5 w-5 text-destructive flex-shrink-0" />
                       )}
                       <div>
                         <p className="font-medium capitalize">{transacao.tipo}</p>
@@ -158,7 +175,7 @@ const Dashboard = () => {
                         </p>
                       </div>
                     </div>
-                    <div className="text-right">
+                    <div className="text-left sm:text-right">
                       <p className="font-medium">{transacao.pontos.toFixed(2)} pts</p>
                       <p className="text-sm text-muted-foreground">
                         R$ {transacao.valor.toFixed(2)}

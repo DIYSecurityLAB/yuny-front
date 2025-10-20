@@ -55,6 +55,21 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    /* Melhorar renderização de texto em mobile */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Suporte para scroll suave */
+    scroll-behavior: smooth;
+  }
+  
+  /* Melhorar acessibilidade do focus */
+  *:focus-visible {
+    @apply outline-2 outline-offset-2 outline-ring;
+  }
+  
+  /* Garantir que elementos não quebrem em mobile */
+  * {
+    min-width: 0;
   }
 }
 
@@ -157,5 +172,85 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Utilitários para responsividade */
+@layer utilities {
+  /* Classe para limitar linhas de texto */
+  .line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+  }
+  
+  .line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+  
+  .line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+  
+  /* Scroll personalizado */
+  .scroll-smooth {
+    scroll-behavior: smooth;
+  }
+  
+  /* Container responsivo customizado */
+  .container-responsive {
+    @apply container mx-auto px-4 sm:px-6 lg:px-8;
+  }
+  
+  /* Touch targets maiores para mobile */
+  .touch-target {
+    @apply min-h-[44px] min-w-[44px];
+  }
+  
+  /* Espacamento responsivo */
+  .spacing-responsive {
+    @apply space-y-4 sm:space-y-6 lg:space-y-8;
+  }
+}
+
+/* Otimizações para performance em mobile */
+@layer base {
+  /* Acelerar animações em mobile */
+  @media (max-width: 768px) {
+    * {
+      animation-duration: 0.2s !important;
+      transition-duration: 0.2s !important;
+    }
+  }
+  
+  /* Melhorar scroll em iOS */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Evitar problemas com zoom em inputs */
+  input[type="text"],
+  input[type="email"],
+  input[type="password"],
+  input[type="number"],
+  input[type="search"],
+  input[type="tel"],
+  input[type="url"],
+  textarea,
+  select {
+    font-size: 16px;
+  }
+  
+  /* Responsive images por padrão */
+  img {
+    max-width: 100%;
+    height: auto;
   }
 }

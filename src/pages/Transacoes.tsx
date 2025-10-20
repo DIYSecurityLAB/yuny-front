@@ -69,10 +69,11 @@ const Transacoes = () => {
       });
 
       navigate('/dashboard');
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
       toast({
         title: 'Erro na compra',
-        description: error.message,
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
@@ -131,10 +132,11 @@ const Transacoes = () => {
       });
 
       navigate('/dashboard');
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
       toast({
         title: 'Erro na venda',
-        description: error.message,
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
@@ -150,29 +152,33 @@ const Transacoes = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-6 sm:py-8">
         <div className="max-w-2xl mx-auto">
-          <div className="mb-8">
-            <h1 className="text-3xl font-bold mb-2">Transações</h1>
+          <div className="mb-6 sm:mb-8">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2">Transações</h1>
             <p className="text-muted-foreground">Compre ou venda pontos</p>
           </div>
 
           <Card>
-            <CardHeader>
-              <CardTitle>Nova Transação</CardTitle>
+            <CardHeader className="p-4 sm:p-6">
+              <CardTitle className="text-lg sm:text-xl">Nova Transação</CardTitle>
               <CardDescription>
                 Cotação atual: 1 real = {cotacao.toFixed(2)} pontos
               </CardDescription>
             </CardHeader>
-            <CardContent>
+            <CardContent className="p-4 sm:p-6 pt-0">
               <Tabs defaultValue={tipo || 'comprar'}>
-                <TabsList className="grid w-full grid-cols-2">
-                  <TabsTrigger value="comprar">Comprar Pontos</TabsTrigger>
-                  <TabsTrigger value="vender">Vender Pontos</TabsTrigger>
+                <TabsList className="grid w-full grid-cols-2 mb-6">
+                  <TabsTrigger value="comprar" className="text-xs sm:text-sm">
+                    Comprar Pontos
+                  </TabsTrigger>
+                  <TabsTrigger value="vender" className="text-xs sm:text-sm">
+                    Vender Pontos
+                  </TabsTrigger>
                 </TabsList>
 
                 <TabsContent value="comprar">
-                  <form onSubmit={handleComprar} className="space-y-4">
+                  <form onSubmit={handleComprar} className="space-y-4 sm:space-y-6">
                     <div className="space-y-2">
                       <Label htmlFor="valor-compra">Valor em Reais (R$)</Label>
                       <Input
@@ -184,20 +190,21 @@ const Transacoes = () => {
                         value={valor}
                         onChange={(e) => setValor(e.target.value)}
                         required
+                        className="text-base"
                       />
                     </div>
-                    <div className="p-4 rounded-lg bg-muted">
-                      <p className="text-sm text-muted-foreground">Você receberá</p>
-                      <p className="text-2xl font-bold text-primary">{pontosCalculados} pontos</p>
+                    <div className="p-4 sm:p-6 rounded-lg bg-muted">
+                      <p className="text-sm text-muted-foreground mb-1">Você receberá</p>
+                      <p className="text-xl sm:text-2xl font-bold text-primary">{pontosCalculados} pontos</p>
                     </div>
-                    <Button type="submit" className="w-full" disabled={loading}>
+                    <Button type="submit" className="w-full" size="lg" disabled={loading}>
                       {loading ? 'Processando...' : 'Comprar Pontos'}
                     </Button>
                   </form>
                 </TabsContent>
 
                 <TabsContent value="vender">
-                  <form onSubmit={handleVender} className="space-y-4">
+                  <form onSubmit={handleVender} className="space-y-4 sm:space-y-6">
                     <div className="space-y-2">
                       <Label htmlFor="valor-venda">Quantidade de Pontos</Label>
                       <Input
@@ -209,13 +216,14 @@ const Transacoes = () => {
                         value={valor}
                         onChange={(e) => setValor(e.target.value)}
                         required
+                        className="text-base"
                       />
                     </div>
-                    <div className="p-4 rounded-lg bg-muted">
-                      <p className="text-sm text-muted-foreground">Você receberá</p>
-                      <p className="text-2xl font-bold text-success">R$ {valorCalculado}</p>
+                    <div className="p-4 sm:p-6 rounded-lg bg-muted">
+                      <p className="text-sm text-muted-foreground mb-1">Você receberá</p>
+                      <p className="text-xl sm:text-2xl font-bold text-success">R$ {valorCalculado}</p>
                     </div>
-                    <Button type="submit" className="w-full" disabled={loading}>
+                    <Button type="submit" className="w-full" size="lg" disabled={loading}>
                       {loading ? 'Processando...' : 'Vender Pontos'}
                     </Button>
                   </form>

@@ -21,7 +21,7 @@ import {
   PaginationPrevious,
 } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
-import { useIsMobile } from "@/hooks/use-mobile";
+import { useIsMobile, useScreenSize } from "@/hooks/use-mobile";
 
 // Mock de produtos para demonstração
 const MOCK_PRODUCTS = Array.from({ length: 24 }, (_, i) => ({
@@ -55,6 +55,7 @@ type SortOption = "relevance" | "price-asc" | "price-desc" | "best-sellers" | "n
 export default function SearchResults() {
   const [searchParams, setSearchParams] = useSearchParams();
   const isMobile = useIsMobile();
+  const screenSize = useScreenSize();
   
   const [searchQuery, setSearchQuery] = useState(searchParams.get("q") || "");
   const [sortBy, setSortBy] = useState<SortOption>("relevance");
@@ -67,7 +68,31 @@ export default function SearchResults() {
     sellers: [],
   });
 
-  const itemsPerPage = 12;
+  // Responsividade para itens por página
+  const getItemsPerPage = () => {
+    switch (screenSize) {
+      case 'mobile':
+        return 8;
+      case 'tablet':
+        return 12;
+      default:
+        return 16;
+    }
+  };
+
+  const itemsPerPage = getItemsPerPage();
+
+  // Responsividade para colunas do grid
+  const getGridCols = () => {
+    switch (screenSize) {
+      case 'mobile':
+        return 'grid-cols-1 xs:grid-cols-2';
+      case 'tablet':
+        return 'grid-cols-2 sm:grid-cols-3';
+      default:
+        return 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5';
+    }
+  };
 
   // Filtragem e ordenação dos produtos
   const filteredProducts = MOCK_PRODUCTS.filter((product) => {
@@ -143,11 +168,11 @@ export default function SearchResults() {
       {/* Header do Marketplace */}
       <MarketplaceHeader />
 
-      <div className="container mx-auto px-4 py-6">
-        <div className="flex gap-6">
+      <div className="container mx-auto px-4 py-4 sm:py-6">
+        <div className="flex gap-4 lg:gap-6">
           {/* Sidebar de Filtros - Desktop */}
           {!isMobile && (
-            <aside className="sticky top-24 h-fit">
+            <aside className="sticky top-24 h-fit min-w-[240px] lg:min-w-[280px]">
               <FilterSidebar
                 filters={filters}
                 onFilterChange={handleFilterChange}
@@ -156,11 +181,11 @@ export default function SearchResults() {
           )}
 
           {/* Área Principal */}
-          <main className="flex-1">
+          <main className="flex-1 min-w-0">
             {/* Cabeçalho com resultados e ordenação */}
-            <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="mb-4 sm:mb-6 flex flex-col gap-3 sm:gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h1 className="text-2xl font-bold">
+                <h1 className="text-xl sm:text-2xl font-bold">
                   {searchQuery ? `Resultados para "${searchQuery}"` : "Todos os Produtos"}
                 </h1>
                 <p className="text-sm text-gray-600">
@@ -168,7 +193,7 @@ export default function SearchResults() {
                 </p>
               </div>
 
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
                 {/* Botão de Filtros - Mobile */}
                 {isMobile && (
                   <FilterSidebar
@@ -180,7 +205,7 @@ export default function SearchResults() {
 
                 {/* Ordenação */}
                 <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)}>
-                  <SelectTrigger className="w-[200px]">
+                  <SelectTrigger className="w-full sm:w-[200px]">
                     <SelectValue placeholder="Ordenar por" />
                   </SelectTrigger>
                   <SelectContent>
@@ -197,7 +222,7 @@ export default function SearchResults() {
             {/* Grid de Produtos */}
             {paginatedProducts.length > 0 ? (
               <>
-                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                <div className={`grid gap-3 sm:gap-4 ${getGridCols()}`}>
                   {paginatedProducts.map((product) => (
                     <ProductCard
                       key={product.id}
@@ -210,24 +235,25 @@ export default function SearchResults() {
 
                 {/* Paginação */}
                 {totalPages > 1 && (
-                  <div className="mt-8 flex justify-center">
+                  <div className="mt-6 sm:mt-8 flex justify-center">
                     <Pagination>
-                      <PaginationContent>
+                      <PaginationContent className="flex-wrap gap-1">
                         <PaginationItem>
                           <PaginationPrevious
                             onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
-                            className={currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                            className={`${currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"} text-xs sm:text-sm`}
                           />
                         </PaginationItem>
 
-                        {[...Array(Math.min(5, totalPages))].map((_, i) => {
+                        {/* Mostrar menos páginas em mobile */}
+                        {[...Array(Math.min(isMobile ? 3 : 5, totalPages))].map((_, i) => {
                           const pageNumber = i + 1;
                           return (
                             <PaginationItem key={pageNumber}>
                               <PaginationLink
                                 onClick={() => setCurrentPage(pageNumber)}
                                 isActive={currentPage === pageNumber}
-                                className="cursor-pointer"
+                                className="cursor-pointer text-xs sm:text-sm"
                               >
                                 {pageNumber}
                               </PaginationLink>
@@ -235,12 +261,12 @@ export default function SearchResults() {
                           );
                         })}
 
-                        {totalPages > 5 && <PaginationEllipsis />}
+                        {totalPages > (isMobile ? 3 : 5) && <PaginationEllipsis />}
 
                         <PaginationItem>
                           <PaginationNext
                             onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
-                            className={currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
+                            className={`${currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"} text-xs sm:text-sm`}
                           />
                         </PaginationItem>
                       </PaginationContent>
@@ -249,11 +275,10 @@ export default function SearchResults() {
                 )}
               </>
             ) : (
-              <div className="py-16 text-center">
-                <p className="text-lg text-gray-600">Nenhum produto encontrado</p>
+              <div className="py-12 sm:py-16 text-center">
+                <p className="text-lg text-gray-600 mb-4">Nenhum produto encontrado</p>
                 <Button
                   variant="outline"
-                  className="mt-4"
                   onClick={() => {
                     setSearchQuery("");
                     setFilters({

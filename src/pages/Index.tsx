@@ -24,31 +24,31 @@ const Index = () => {
         </div>
       </nav>
 
-      <main className="container mx-auto px-4 py-20">
-        <div className="text-center space-y-6 mb-16">
+      <main className="container mx-auto px-4 py-12 sm:py-16 lg:py-20">
+        <div className="text-center space-y-6 mb-12 sm:mb-16">
           <div className="inline-block">
-            <div className="h-20 w-20 mx-auto rounded-2xl bg-gradient-to-br from-primary via-secondary to-accent animate-pulse" />
+            <div className="h-16 w-16 sm:h-20 sm:w-20 mx-auto rounded-2xl bg-gradient-to-br from-primary via-secondary to-accent animate-pulse" />
           </div>
-          <h1 className="text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent leading-tight">
             YunY Nexus
           </h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
             Plataforma completa de conversão de pontos e criptomoedas.
             Compre, venda e troque com segurança e facilidade.
           </p>
-          <div className="flex gap-4 justify-center">
-            <Button size="lg" onClick={() => navigate('/auth')}>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center px-4">
+            <Button size="lg" onClick={() => navigate('/auth')} className="w-full sm:w-auto">
               Começar Agora
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-            <Button size="lg" variant="outline" onClick={() => navigate('/busca')}>
+            <Button size="lg" variant="outline" onClick={() => navigate('/busca')} className="w-full sm:w-auto">
               Explorar Produtos
             </Button>
           </div>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          <div className="p-6 rounded-xl border border-border bg-card hover:bg-accent/5 transition-colors">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8 max-w-5xl mx-auto">
+          <div className="p-6 lg:p-8 rounded-xl border border-border bg-card hover:bg-accent/5 transition-colors">
             <Coins className="h-10 w-10 text-primary mb-4" />
             <h3 className="text-xl font-bold mb-2">Conversão Rápida</h3>
             <p className="text-muted-foreground">
@@ -56,7 +56,7 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="p-6 rounded-xl border border-border bg-card hover:bg-accent/5 transition-colors">
+          <div className="p-6 lg:p-8 rounded-xl border border-border bg-card hover:bg-accent/5 transition-colors">
             <TrendingUp className="h-10 w-10 text-secondary mb-4" />
             <h3 className="text-xl font-bold mb-2">Transações P2P</h3>
             <p className="text-muted-foreground">
@@ -64,7 +64,7 @@ const Index = () => {
             </p>
           </div>
 
-          <div className="p-6 rounded-xl border border-border bg-card hover:bg-accent/5 transition-colors">
+          <div className="p-6 lg:p-8 rounded-xl border border-border bg-card hover:bg-accent/5 transition-colors md:col-span-2 lg:col-span-1">
             <ShoppingBag className="h-10 w-10 text-accent mb-4" />
             <h3 className="text-xl font-bold mb-2">Marketplace</h3>
             <p className="text-muted-foreground">
