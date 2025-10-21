@@ -16,7 +16,7 @@ const Transacoes = () => {
   const { tipo } = useParams<{ tipo: string }>();
   
   const [valor, setValor] = useState('');
-  const [cotacao] = useState(1.5); // Cotação simulada
+  const [cotacao] = useState(1);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
