@@ -22,11 +22,19 @@ interface Transacao {
   user_id: string;
 }
 
+interface BalanceResponse {
+  userId: string;
+  availablePoints: number;
+  pendingPoints: number;
+  totalPoints: number;
+}
+
 const Dashboard = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const [saldo, setSaldo] = useState<number | null>(null);
+  const [pendingPoints, setPendingPoints] = useState<number>(0);
   const [transacoes, setTransacoes] = useState<Transacao[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -40,40 +48,22 @@ const Dashboard = () => {
     if (!user) return;
     
     try {
-      // TODO: Implementar endpoints para buscar saldo e transações na API YunY
-      // Por enquanto, simular dados
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      // Buscar saldo da API YunY
+      const balanceData = await yunYAuth.authenticatedRequest<BalanceResponse>('/points/balance', {
+        method: 'GET'
+      });
       
-      // Dados simulados
-      setSaldo(1500.50);
-      setTransacoes([
-        {
-          id: '1',
-          tipo: 'deposito',
-          valor: 100,
-          pontos: 100,
-          cotacao: 1,
-          status: 'concluida',
-          created_at: new Date().toISOString(),
-          user_id: user.id,
-          destinatario_id: null,
-          produto_id: null
-        },
-        {
-          id: '2',
-          tipo: 'saque',
-          valor: 50,
-          pontos: 50,
-          cotacao: 1,
-          status: 'pendente',
-          created_at: new Date(Date.now() - 86400000).toISOString(),
-          user_id: user.id,
-          destinatario_id: null,
-          produto_id: null
-        }
-      ]);
+      setSaldo(balanceData.availablePoints);
+      setPendingPoints(balanceData.pendingPoints);
+      
+      // TODO: Implementar endpoint para buscar transações na API YunY
+      // Por enquanto, manter vazio
+      setTransacoes([]);
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
+      // Em caso de erro, definir valores padrão
+      setSaldo(0);
+      setPendingPoints(0);
     } finally {
       setLoading(false);
     }
@@ -101,13 +91,20 @@ const Dashboard = () => {
         <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 mb-6 sm:mb-8">
           <Card className="col-span-1 sm:col-span-2 lg:col-span-1">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Saldo em Pontos</CardTitle>
+              <CardTitle className="text-sm font-medium">Saldo Disponível</CardTitle>
             </CardHeader>
             <CardContent>
               {loading ? (
                 <Skeleton className="h-8 w-32" />
               ) : (
-                <div className="text-2xl font-bold">{saldo?.toFixed(2) || '0.00'} pts</div>
+                <>
+                  <div className="text-2xl font-bold">{saldo?.toFixed(2) || '0.00'} pts</div>
+                  {pendingPoints > 0 && (
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {pendingPoints.toFixed(2)} pts pendentes
+                    </p>
+                  )}
+                </>
               )}
             </CardContent>
           </Card>
@@ -149,7 +146,8 @@ const Dashboard = () => {
           </Card>
         </div>
 
-        <Card>
+        {/* Seção de transações desabilitada temporariamente */}
+        {/* <Card>
           <CardHeader>
             <CardTitle className="text-lg sm:text-xl">Transações Recentes</CardTitle>
             <CardDescription>Suas últimas 5 transações</CardDescription>
@@ -196,7 +194,7 @@ const Dashboard = () => {
               </div>
             )}
           </CardContent>
-        </Card>
+        </Card> */}
       </div>
     </div>
   );
