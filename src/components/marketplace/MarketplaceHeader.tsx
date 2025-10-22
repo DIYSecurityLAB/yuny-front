@@ -88,7 +88,7 @@ export function MarketplaceHeader() {
               <User className="h-6 w-6" />
             </div>
             <div>
-              <p className="font-medium">Olá, {user.email?.split("@")[0]}</p>
+              <p className="font-medium">Olá, {user.nome || user.email?.split("@")[0]}</p>
               <Link
                 to="/perfil"
                 className="text-sm text-blue-600 hover:underline"
@@ -399,7 +399,7 @@ export function MarketplaceHeader() {
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost">
                     <User className="mr-2 h-4 w-4" />
-                    Olá, {user.email?.split("@")[0]}
+                    Olá, {user.nome || user.email?.split("@")[0]}
                     <ChevronDown className="ml-1 h-4 w-4" />
                   </Button>
                 </DropdownMenuTrigger>

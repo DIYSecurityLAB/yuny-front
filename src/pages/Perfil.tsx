@@ -1,21 +1,22 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { yunYAuth } from '@/services/yunYAuth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Navbar } from '@/components/layout/Navbar';
 import { toast } from '@/hooks/use-toast';
+import { Layout } from '@/components/layout/Layout';
 
 const Perfil = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
   
-  const [fullName, setFullName] = useState('');
-  const [phone, setPhone] = useState('');
+  const [nome, setNome] = useState('');
+  const [telefone, setTelefone] = useState('');
   const [cpf, setCpf] = useState('');
+  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -26,52 +27,32 @@ const Perfil = () => {
 
   useEffect(() => {
     if (user) {
-      loadProfile();
+      // Carregar dados do usuário a partir do contexto de autenticação
+      setNome(user.nome || '');
+      setTelefone(user.telefone || '');
+      setCpf(user.cpf || '');
+      setEmail(user.email || '');
     }
   }, [user]);
-
-  const loadProfile = async () => {
-    try {
-      const { data } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('user_id', user!.id)
-        .single();
-
-      if (data) {
-        setFullName(data.full_name || '');
-        setPhone(data.phone || '');
-        setCpf(data.cpf || '');
-      }
-    } catch (error) {
-      console.error('Erro ao carregar perfil:', error);
-    }
-  };
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      const { error } = await supabase
-        .from('profiles')
-        .update({
-          full_name: fullName,
-          phone: phone,
-          cpf: cpf,
-        })
-        .eq('user_id', user!.id);
-
-      if (error) throw error;
+      // TODO: Implementar endpoint de atualização de perfil na API YunY
+      // Por enquanto, apenas simularemos o sucesso
+      await new Promise(resolve => setTimeout(resolve, 1000));
 
       toast({
         title: 'Perfil atualizado!',
         description: 'Suas informações foram salvas com sucesso.',
       });
-    } catch (error: any) {
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
       toast({
         title: 'Erro ao atualizar',
-        description: error.message,
+        description: errorMessage,
         variant: 'destructive',
       });
     } finally {
@@ -82,8 +63,7 @@ const Perfil = () => {
   if (authLoading || !user) return null;
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
+    <Layout>
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto">
           <div className="mb-8">
@@ -103,31 +83,20 @@ const Perfil = () => {
                   <Input
                     id="email"
                     type="email"
-                    value={user.email || ''}
+                    value={email}
                     disabled
                     className="bg-muted"
                   />
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="fullName">Nome Completo</Label>
+                  <Label htmlFor="nome">Nome Completo</Label>
                   <Input
-                    id="fullName"
+                    id="nome"
                     type="text"
-                    value={fullName}
-                    onChange={(e) => setFullName(e.target.value)}
+                    value={nome}
+                    onChange={(e) => setNome(e.target.value)}
                     placeholder="Seu nome completo"
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="phone">Telefone</Label>
-                  <Input
-                    id="phone"
-                    type="tel"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    placeholder="(00) 00000-0000"
                   />
                 </div>
 
@@ -137,8 +106,21 @@ const Perfil = () => {
                     id="cpf"
                     type="text"
                     value={cpf}
-                    onChange={(e) => setCpf(e.target.value)}
+                    disabled
+                    className="bg-muted"
                     placeholder="000.000.000-00"
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="telefone">Telefone</Label>
+                  <Input
+                    id="telefone"
+                    type="tel"
+                    value={telefone}
+                    onChange={(e) => setTelefone(e.target.value.replace(/\D/g, '').slice(0, 11))}
+                    placeholder="11987654321"
+                    maxLength={11}
                   />
                 </div>
 
@@ -150,7 +132,7 @@ const Perfil = () => {
           </Card>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 

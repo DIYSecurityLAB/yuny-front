@@ -30,7 +30,7 @@ const Index = () => {
             <div className="h-16 w-16 sm:h-20 sm:w-20 mx-auto rounded-2xl bg-gradient-to-br from-primary via-secondary to-accent animate-pulse" />
           </div>
           <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold bg-gradient-to-r from-primary via-secondary to-accent bg-clip-text text-transparent leading-tight">
-            YunY Nexus
+            YunY
           </h1>
           <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto px-4">
             Plataforma completa de conversão de pontos e criptomoedas.
