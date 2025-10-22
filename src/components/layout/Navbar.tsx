@@ -130,21 +130,17 @@ export const Navbar = () => {
           <div className="flex items-center space-x-2 md:space-x-4">
             {user ? (
               <>
-                {!isMobile && (
-                  <>
-                    <Button variant="ghost" onClick={() => navigate('/dashboard')} className="hidden md:flex">
-                      <LayoutDashboard className="mr-2 h-4 w-4" />
-                      Dashboard
-                    </Button>
-                    <Button variant="ghost" onClick={() => navigate('/busca')} className="hidden lg:flex">
-                      <ShoppingBag className="mr-2 h-4 w-4" />
-                      Marketplace
-                    </Button>
-                    <Button variant="ghost" onClick={() => navigate('/transacoes')} className="hidden lg:flex">
-                      Transações
-                    </Button>
-                  </>
-                )}
+                <Button variant="ghost" onClick={() => navigate('/dashboard')} className="hidden md:flex">
+                  <LayoutDashboard className="mr-2 h-4 w-4" />
+                  Dashboard
+                </Button>
+                <Button variant="ghost" onClick={() => navigate('/busca')}>
+                  <ShoppingBag className="mr-2 h-4 w-4" />
+                  Marketplace
+                </Button>
+                <Button variant="ghost" onClick={() => navigate('/transacoes')} className="hidden lg:flex">
+                  Transações
+                </Button>
                 
                 <Button variant="ghost" size="icon" onClick={() => navigate('/carrinho')}>
                   <ShoppingCart className="h-5 w-5" />
@@ -189,7 +185,13 @@ export const Navbar = () => {
                 </DropdownMenu>
               </>
             ) : (
-              <Button onClick={() => navigate('/auth')}>Entrar</Button>
+              <>
+                <Button variant="ghost" onClick={() => navigate('/busca')}>
+                  <ShoppingBag className="mr-2 h-4 w-4" />
+                  Marketplace
+                </Button>
+                <Button onClick={() => navigate('/auth')}>Entrar</Button>
+              </>
             )}
           </div>
         </div>
