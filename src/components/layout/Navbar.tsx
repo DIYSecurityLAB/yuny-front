@@ -16,7 +16,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from '@/components/ui/sheet';
-import { User, LogOut, Settings, LayoutDashboard, ShoppingBag, ShoppingCart, Menu } from 'lucide-react';
+import { User, LogOut, Settings, LayoutDashboard, ShoppingBag, ShoppingCart, Menu, HelpCircle, FileText, MessageCircle, Phone } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useState } from 'react';
 

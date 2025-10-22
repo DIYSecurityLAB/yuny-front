@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { yunYAuth } from '@/services/yunYAuth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Navbar } from '@/components/layout/Navbar';
@@ -40,28 +40,38 @@ const Dashboard = () => {
     if (!user) return;
     
     try {
-      // Buscar saldo
-      const { data: pontosData } = await supabase
-        .from('pontos')
-        .select('saldo')
-        .eq('user_id', user.id)
-        .single();
-
-      if (pontosData) {
-        setSaldo(pontosData.saldo);
-      }
-
-      // Buscar transações recentes
-      const { data: transacoesData } = await supabase
-        .from('transacoes')
-        .select('*')
-        .eq('user_id', user.id)
-        .order('created_at', { ascending: false })
-        .limit(5);
-
-      if (transacoesData) {
-        setTransacoes(transacoesData);
-      }
+      // TODO: Implementar endpoints para buscar saldo e transações na API YunY
+      // Por enquanto, simular dados
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      // Dados simulados
+      setSaldo(1500.50);
+      setTransacoes([
+        {
+          id: '1',
+          tipo: 'deposito',
+          valor: 100,
+          pontos: 100,
+          cotacao: 1,
+          status: 'concluida',
+          created_at: new Date().toISOString(),
+          user_id: user.id,
+          destinatario_id: null,
+          produto_id: null
+        },
+        {
+          id: '2',
+          tipo: 'saque',
+          valor: 50,
+          pontos: 50,
+          cotacao: 1,
+          status: 'pendente',
+          created_at: new Date(Date.now() - 86400000).toISOString(),
+          user_id: user.id,
+          destinatario_id: null,
+          produto_id: null
+        }
+      ]);
     } catch (error) {
       console.error('Erro ao carregar dados:', error);
     } finally {

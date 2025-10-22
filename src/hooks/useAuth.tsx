@@ -1,136 +1,75 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { User, Session } from '@supabase/supabase-js';
-import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
-import { toast } from '@/hooks/use-toast';
+import { yunYAuth } from '@/services/yunYAuth';
+
+interface User {
+  id: string;
+  nome: string;
+  email: string;
+  cpf: string;
+  telefone: string;
+}
 
 interface AuthContextType {
   user: User | null;
-  session: Session | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string, fullName?: string) => Promise<void>;
+  signIn: (identifier: string, password: string) => Promise<void>;
+  signUp: (nome: string, cpf: string, email: string, telefone: string, senha: string) => Promise<void>;
   signOut: () => Promise<void>;
+  forgotPassword: (identifier: string) => Promise<void>;
+  resetPassword: (token: string, novaSenha: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Set up auth state listener
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
-      }
-    );
-
-    // Check for existing session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
+    // Verificar se há um usuário logado ao inicializar
+    const currentUser = yunYAuth.getUser();
+    setUser(currentUser);
+    setLoading(false);
   }, []);
 
-  const signIn = async (email: string, password: string) => {
-    try {
-      const { error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (error) throw error;
-
-      toast({
-        title: "Login realizado com sucesso!",
-        description: "Bem-vindo de volta à YunY.",
-      });
-      
-      navigate('/dashboard');
-    } catch (error: any) {
-      toast({
-        title: "Erro no login",
-        description: error.message,
-        variant: "destructive",
-      });
-      throw error;
-    }
+  const signIn = async (identifier: string, password: string) => {
+    const response = await yunYAuth.login({ identifier, senha: password });
+    setUser(response.data.user);
+    navigate('/dashboard');
   };
 
-  const signUp = async (email: string, password: string, fullName?: string) => {
-    try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          emailRedirectTo: `${window.location.origin}/dashboard`,
-          data: {
-            full_name: fullName,
-          },
-        },
-      });
-
-      if (error) throw error;
-
-      // Create profile
-      if (data.user) {
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert({
-            user_id: data.user.id,
-            full_name: fullName,
-          });
-
-        if (profileError) throw profileError;
-      }
-
-      toast({
-        title: "Conta criada com sucesso!",
-        description: "Você já pode fazer login na plataforma.",
-      });
-
-      navigate('/auth');
-    } catch (error: any) {
-      toast({
-        title: "Erro no cadastro",
-        description: error.message,
-        variant: "destructive",
-      });
-      throw error;
-    }
+  const signUp = async (nome: string, cpf: string, email: string, telefone: string, senha: string) => {
+    await yunYAuth.register({ nome, cpf, email, telefone, senha });
+    // Após o registro bem-sucedido, redirecionar para login
+    navigate('/auth');
   };
 
   const signOut = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
+    yunYAuth.logout();
+    setUser(null);
+    navigate('/');
+  };
 
-      toast({
-        title: "Logout realizado",
-        description: "Até logo!",
-      });
-      
-      navigate('/');
-    } catch (error: any) {
-      toast({
-        title: "Erro no logout",
-        description: error.message,
-        variant: "destructive",
-      });
-    }
+  const forgotPassword = async (identifier: string) => {
+    await yunYAuth.forgotPassword({ identifier });
+  };
+
+  const resetPassword = async (token: string, novaSenha: string) => {
+    await yunYAuth.resetPassword({ token, novaSenha });
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, loading, signIn, signUp, signOut }}>
+    <AuthContext.Provider value={{ 
+      user, 
+      loading, 
+      signIn, 
+      signUp, 
+      signOut, 
+      forgotPassword, 
+      resetPassword 
+    }}>
       {children}
     </AuthContext.Provider>
   );

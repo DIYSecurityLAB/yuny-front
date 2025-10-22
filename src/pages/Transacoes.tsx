@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useNavigate, useParams } from 'react-router-dom';
-import { supabase } from '@/integrations/supabase/client';
+import { yunYAuth } from '@/services/yunYAuth';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Navbar } from '@/components/layout/Navbar';
+
 import { toast } from '@/hooks/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Layout } from '@/components/layout/Layout';
 
 const Transacoes = () => {
   const { user, loading: authLoading } = useAuth();
@@ -34,38 +35,13 @@ const Transacoes = () => {
       const valorNum = parseFloat(valor);
       const pontosComprados = valorNum * cotacao;
 
-      // Buscar saldo atual
-      const { data: pontosData } = await supabase
-        .from('pontos')
-        .select('saldo')
-        .eq('user_id', user.id)
-        .single();
-
-      const saldoAtual = pontosData?.saldo || 0;
-
-      // Criar transação
-      const { error: transacaoError } = await supabase.from('transacoes').insert({
-        user_id: user.id,
-        tipo: 'compra',
-        valor: valorNum,
-        pontos: pontosComprados,
-        cotacao: cotacao,
-        status: 'concluida',
-      });
-
-      if (transacaoError) throw transacaoError;
-
-      // Atualizar saldo
-      const { error: updateError } = await supabase
-        .from('pontos')
-        .update({ saldo: saldoAtual + pontosComprados })
-        .eq('user_id', user.id);
-
-      if (updateError) throw updateError;
+      // TODO: Implementar endpoints para transações na API YunY
+      // Por enquanto, simular o processo
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
       toast({
-        title: 'Compra realizada!',
-        description: `Você comprou ${pontosComprados.toFixed(2)} pontos.`,
+        title: 'Compra simulada!',
+        description: `Você compraria ${pontosComprados.toFixed(2)} pontos por R$ ${valorNum.toFixed(2)}.`,
       });
 
       navigate('/dashboard');
@@ -90,45 +66,13 @@ const Transacoes = () => {
       const pontosNum = parseFloat(valor);
       const valorResgate = pontosNum / cotacao;
 
-      // Verificar saldo
-      const { data: pontosData } = await supabase
-        .from('pontos')
-        .select('saldo')
-        .eq('user_id', user.id)
-        .single();
-
-      if (!pontosData || pontosData.saldo < pontosNum) {
-        toast({
-          title: 'Saldo insuficiente',
-          description: 'Você não tem pontos suficientes.',
-          variant: 'destructive',
-        });
-        return;
-      }
-
-      // Criar transação
-      const { error: transacaoError } = await supabase.from('transacoes').insert({
-        user_id: user.id,
-        tipo: 'venda',
-        valor: valorResgate,
-        pontos: pontosNum,
-        cotacao: cotacao,
-        status: 'concluida',
-      });
-
-      if (transacaoError) throw transacaoError;
-
-      // Atualizar saldo
-      const { error: updateError } = await supabase
-        .from('pontos')
-        .update({ saldo: pontosData.saldo - pontosNum })
-        .eq('user_id', user.id);
-
-      if (updateError) throw updateError;
+      // TODO: Implementar verificação de saldo e transação na API YunY
+      // Por enquanto, simular o processo
+      await new Promise(resolve => setTimeout(resolve, 2000));
 
       toast({
-        title: 'Venda realizada!',
-        description: `Você vendeu ${pontosNum.toFixed(2)} pontos por R$ ${valorResgate.toFixed(2)}.`,
+        title: 'Venda simulada!',
+        description: `Você venderia ${pontosNum.toFixed(2)} pontos por R$ ${valorResgate.toFixed(2)}.`,
       });
 
       navigate('/dashboard');
@@ -150,8 +94,7 @@ const Transacoes = () => {
   const valorCalculado = valor ? (parseFloat(valor) / cotacao).toFixed(2) : '0.00';
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
+    <Layout>
       <div className="container mx-auto px-4 py-6 sm:py-8">
         <div className="max-w-2xl mx-auto">
           <div className="mb-6 sm:mb-8">
@@ -233,7 +176,7 @@ const Transacoes = () => {
           </Card>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 };
 

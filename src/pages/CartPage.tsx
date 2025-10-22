@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Minus, Plus, Trash2, ShoppingBag, ArrowRight } from "lucide-react";
-import { MarketplaceHeader } from "@/components/marketplace/MarketplaceHeader";
+import { Layout } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -117,8 +117,7 @@ export default function CartPage() {
 
   if (cartItems.length === 0) {
     return (
-      <div>
-        <MarketplaceHeader />
+      <Layout>
         <div className="flex min-h-screen items-center justify-center bg-gray-50">
         <Card className="w-full max-w-md text-center">
           <CardContent className="p-12">
@@ -133,13 +132,12 @@ export default function CartPage() {
           </CardContent>
         </Card>
       </div>
-      </div>
+      </Layout>
     );
   }
 
   return (
-    <div>
-      <MarketplaceHeader />
+    <Layout>
       <div className="min-h-screen bg-gray-50 py-8">
         <div className="container mx-auto px-4">
           <h1 className="mb-8 text-3xl font-bold">Carrinho de Compras</h1>
@@ -377,6 +375,6 @@ export default function CartPage() {
         </div>
       </div>
       </div>
-    </div>
+    </Layout>
   );
 }
