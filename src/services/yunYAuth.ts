@@ -33,19 +33,21 @@ interface ResetPasswordRequest {
 }
 
 interface User {
-  id: string;
+  user_id: string;
   nome: string;
   email: string;
   cpf: string;
   telefone: string;
+  data_criacao?: string;
+  ultimo_login?: string;
 }
 
 interface AuthResponse {
   message: string;
   data: {
-    accessToken: string;
-    refreshToken: string;
     user: User;
+    access_token: string;
+    refresh_token: string;
   };
 }
 
@@ -111,14 +113,25 @@ export class YunYAuthService {
   }
 
   // Armazenar tokens no localStorage
-  private storeTokens(data: AuthResponse['data']) {
-    this.accessToken = data.accessToken;
-    this.refreshToken = data.refreshToken;
-    this.user = data.user;
+  private storeTokens(response: AuthResponse) {
+    const accessToken = response.data.access_token;
+    const refreshToken = response.data.refresh_token;
+    const user = response.data.user;
 
-    localStorage.setItem('yuny_access_token', data.accessToken);
-    localStorage.setItem('yuny_refresh_token', data.refreshToken);
-    localStorage.setItem('yuny_user', JSON.stringify(data.user));
+    if (!accessToken || !refreshToken || !user) {
+      console.error('Resposta da API inválida:', response);
+      throw new Error('Tokens ou dados do usuário não encontrados na resposta');
+    }
+
+    this.accessToken = accessToken;
+    this.refreshToken = refreshToken;
+    this.user = user;
+
+    localStorage.setItem('yuny_access_token', accessToken);
+    localStorage.setItem('yuny_refresh_token', refreshToken);
+    localStorage.setItem('yuny_user', JSON.stringify(user));
+    
+    console.log('✅ Tokens salvos com sucesso no localStorage');
   }
 
   // Limpar tokens do localStorage
@@ -165,7 +178,7 @@ export class YunYAuthService {
         body: JSON.stringify(data),
       });
 
-      this.storeTokens(response.data);
+      this.storeTokens(response);
 
       toast({
         title: 'Login realizado com sucesso!',
@@ -191,16 +204,18 @@ export class YunYAuthService {
     }
 
     try {
-      const response = await apiRequest<{ data: { accessToken: string; refreshToken: string } }>('/auth/refresh', {
+      const response = await apiRequest<{ data: { access_token: string; refresh_token: string } }>('/auth/refresh', {
         method: 'POST',
-        body: JSON.stringify({ refreshToken: this.refreshToken }),
+        body: JSON.stringify({ refresh_token: this.refreshToken }),
       });
 
-      this.accessToken = response.data.accessToken;
-      this.refreshToken = response.data.refreshToken;
+      this.accessToken = response.data.access_token;
+      this.refreshToken = response.data.refresh_token;
 
-      localStorage.setItem('yuny_access_token', response.data.accessToken);
-      localStorage.setItem('yuny_refresh_token', response.data.refreshToken);
+      localStorage.setItem('yuny_access_token', response.data.access_token);
+      localStorage.setItem('yuny_refresh_token', response.data.refresh_token);
+      
+      console.log('✅ Token renovado com sucesso');
     } catch (error) {
       // Se falhar ao renovar, fazer logout
       this.logout();

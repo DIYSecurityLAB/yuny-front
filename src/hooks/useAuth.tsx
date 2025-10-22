@@ -4,6 +4,7 @@ import { yunYAuth } from '@/services/yunYAuth';
 
 interface User {
   id: string;
+  user_id?: string;
   nome: string;
   email: string;
   cpf: string;
@@ -30,13 +31,25 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     // Verificar se há um usuário logado ao inicializar
     const currentUser = yunYAuth.getUser();
-    setUser(currentUser);
+    if (currentUser) {
+      // Mapear user_id para id se necessário
+      const mappedUser: User = {
+        ...currentUser,
+        id: currentUser.user_id,
+      };
+      setUser(mappedUser);
+    }
     setLoading(false);
   }, []);
 
   const signIn = async (identifier: string, password: string) => {
     const response = await yunYAuth.login({ identifier, senha: password });
-    setUser(response.data.user);
+    // Mapear user_id para id
+    const mappedUser = {
+      ...response.data.user,
+      id: response.data.user.user_id,
+    };
+    setUser(mappedUser);
     navigate('/dashboard');
   };
 
